@@ -36,16 +36,21 @@ titanic <- titanic %>%
     TRUE ~ "Senior"
   ))
 
-ggplot(titanic, aes(x = Sex, fill = factor(Survived))) + 
-  geom_bar(position = "fill")+
-  labs(title = "Survival Rate By Gender", fill = "Survived", y = "Proportion")
+SurvivalBySex$SurvivalRate <- SurvivalBySex$SurvivalRate * 100
+SurvivalByPclass$SurvivalRate <- SurvivalByPclass$SurvivalRate * 100
+  
 
-ggplot(titanic, aes(x = factor(Pclass), fill = factor(Survived))) + 
-  geom_bar(position = "fill")+
-  labs(title = "Survival Rate By Passanger Class", fill = "Survived", y = "Proportion")
+ggplot(SurvivalBySex, aes(x = Sex, y = SurvivalRate)) +
+  geom_col(fill = "steelblue", color = "black", width = 0.5) +
+  labs(title = "Passenger Proportion by Gender", y = "Percentage")
+
+ggplot(SurvivalByPclass, aes(x = Pclass, y = SurvivalRate)) +
+  geom_col(fill = "steelblue", color = "black", width = 0.5) +
+  labs(title = "Passenger Proportion by Class", x = "Passenger Class", y = "Percentage")
 
 ggplot(titanic, aes(x = Age, fill = factor(Survived))) + 
   geom_histogram(bins=30, alpha=0.6, position="identity") +
   labs(title = "Age distribution by Survival", fill = "Survived")
+
 
 
