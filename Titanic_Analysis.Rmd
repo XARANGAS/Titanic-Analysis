@@ -1,0 +1,84 @@
+---
+title: "Titanic_Analysis"
+author: "Aden Emre UNAL"
+date: "2025-08-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
+```
+
+## Load the Dataset
+```{r load-data}
+titanic <- read_csv("train.csv")
+head(titanic, 10)
+```
+
+## Explore the Data
+```{r explore}
+str(titanic)
+summary(titanic)
+colSums(is.na(titanic))
+```
+
+## Handle Missing Data
+```{r clean}
+titanic <- titanic %>%
+  mutate(Age = ifelse(is.na(Age), mean(Age, na.rm = TRUE), Age))
+titanic$Embarked[is.na(titanic$Embarked)] <- "S"
+```
+
+## Basic Analysis
+```{r analysis}
+SurvivalBySex <- titanic %>%
+  group_by(Sex) %>%
+  summarise(SurvivalRate = mean(Survived))
+
+SurvivalByPclass <- titanic %>%
+  group_by(Pclass) %>%
+  summarise(SurvivalRate = mean(Survived))
+```
+
+## Set Age Groups
+```{r age-groups}
+titanic <- titanic %>%
+  mutate(AgeGroup = case_when(
+    Age < 12 ~ "Child",
+    Age < 18 ~ "Teen",
+    Age < 40 ~ "Adult",
+    Age < 60 ~ "Middle",
+    TRUE ~ "Senior"
+  ))
+head(titanic$AgeGroup, 20)
+```
+
+## Visualization
+```{r plots, fig.width=6, fig.height=4}
+ggplot(titanic, aes(x=Sex, fill=factor(Survived))) +
+  geom_bar(position="fill") +
+  labs(title="Survival Rate by Gender", fill="Survived", y="Proportion")
+
+ggplot(titanic, aes(x=factor(Pclass), fill=factor(Survived))) +
+  geom_bar(position="fill") +
+  labs(title="Survival Rate by Passenger Class", fill="Survived", y="Proportion")
+
+ggplot(titanic, aes(x=Age, fill=factor(Survived))) +
+  geom_histogram(bins=30, alpha=0.6, position="identity") +
+  labs(title="Age Distribution by Survival", fill="Survived")
+```
+
+## Findings
+```{r results, echo=FALSE}
+cat("
+###  Key Findings:
+- Female passengers had a significantly higher survival rate than males.
+- Upper class passengers survived more often than those in lower classes.
+- Age played an important role in survival outcomes.
+")
+```
+
